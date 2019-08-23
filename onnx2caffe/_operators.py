@@ -76,6 +76,23 @@ def _convert_relu(node,graph,err):
 
     return layer
 
+def _convert_elu(node,graph,err):
+    input_name = str(node.inputs[0])
+    output_name = str(node.outputs[0])
+    name = str(node.name)
+
+    if input_name==output_name:
+        inplace = True
+    else:
+        inplace = False
+
+    layer = myf("ELU",name,[input_name],[output_name],in_place=inplace)
+    # l_top_relu1 = L.ReLU(l_bottom, name=name, in_place=True)
+
+    graph.channel_dims[output_name] = graph.channel_dims[input_name]
+
+    return layer
+
 def _convert_sigmoid(node,graph,err):
     input_name = str(node.inputs[0])
     output_name = str(node.outputs[0])
@@ -384,6 +401,7 @@ def _convert_conv_transpose(node,graph,err):
 _ONNX_NODE_REGISTRY = {
     "Conv": _convert_conv,
     "Relu": _convert_relu,
+    "Elu": _convert_elu,
     "BatchNormalization": _convert_BatchNorm,
     "Add": _convert_Add,
     "Mul": _convert_Mul,
